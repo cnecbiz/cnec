@@ -1,0 +1,235 @@
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { supabase } from '@/lib/supabase'
+
+/**
+ * 인증 상태 관리 스토어
+ */
+export const useAuthStore = create(
+  persist(
+    (set, get) => ({
+      // State
+      user: null,
+      profile: null,
+      session: null,
+      isLoading: true,
+      isAuthenticated: false,
+
+      // Actions
+      setUser: (user) => set({ user, isAuthenticated: !!user }),
+      setProfile: (profile) => set({ profile }),
+      setSession: (session) => set({ session }),
+      setLoading: (isLoading) => set({ isLoading }),
+
+      // 로그인
+      signIn: async ({ email, password }) => {
+        set({ isLoading: true })
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+          if (error) throw error
+
+          set({
+            user: data.user,
+            session: data.session,
+            isAuthenticated: true,
+            isLoading: false,
+          })
+
+          // 프로필 정보 가져오기
+          await get().fetchProfile()
+
+          return { data, error: null }
+        } catch (error) {
+          set({ isLoading: false })
+          return { data: null, error }
+        }
+      },
+
+      // 회원가입
+      signUp: async ({ email, password, userType, metadata }) => {
+        set({ isLoading: true })
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                user_type: userType,
+                ...metadata,
+              },
+            },
+          })
+          if (error) throw error
+
+          set({ isLoading: false })
+          return { data, error: null }
+        } catch (error) {
+          set({ isLoading: false })
+          return { data: null, error }
+        }
+      },
+
+      // 소셜 로그인
+      signInWithProvider: async (provider) => {
+        try {
+          const { data, error } = await supabase.auth.signInWithOAuth({
+            provider,
+            options: {
+              redirectTo: `${window.location.origin}/auth/callback`,
+            },
+          })
+          if (error) throw error
+          return { data, error: null }
+        } catch (error) {
+          return { data: null, error }
+        }
+      },
+
+      // 로그아웃
+      signOut: async () => {
+        set({ isLoading: true })
+        try {
+          const { error } = await supabase.auth.signOut()
+          if (error) throw error
+
+          set({
+            user: null,
+            profile: null,
+            session: null,
+            isAuthenticated: false,
+            isLoading: false,
+          })
+
+          return { error: null }
+        } catch (error) {
+          set({ isLoading: false })
+          return { error }
+        }
+      },
+
+      // 프로필 가져오기
+      fetchProfile: async () => {
+        const { user } = get()
+        if (!user) return
+
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single()
+
+          if (error && error.code !== 'PGRST116') throw error
+
+          set({ profile: data })
+          return { data, error: null }
+        } catch (error) {
+          return { data: null, error }
+        }
+      },
+
+      // 프로필 업데이트
+      updateProfile: async (updates) => {
+        const { user } = get()
+        if (!user) return { data: null, error: new Error('Not authenticated') }
+
+        try {
+          const { data, error } = await supabase
+            .from('profiles')
+            .upsert({
+              id: user.id,
+              ...updates,
+              updated_at: new Date().toISOString(),
+            })
+            .select()
+            .single()
+
+          if (error) throw error
+
+          set({ profile: data })
+          return { data, error: null }
+        } catch (error) {
+          return { data: null, error }
+        }
+      },
+
+      // 세션 초기화
+      initializeAuth: async () => {
+        set({ isLoading: true })
+        try {
+          const { data: { session } } = await supabase.auth.getSession()
+
+          if (session) {
+            set({
+              user: session.user,
+              session,
+              isAuthenticated: true,
+            })
+            await get().fetchProfile()
+          }
+
+          set({ isLoading: false })
+
+          // 인증 상태 변경 리스너
+          supabase.auth.onAuthStateChange(async (event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+              set({
+                user: session.user,
+                session,
+                isAuthenticated: true,
+              })
+              await get().fetchProfile()
+            } else if (event === 'SIGNED_OUT') {
+              set({
+                user: null,
+                profile: null,
+                session: null,
+                isAuthenticated: false,
+              })
+            } else if (event === 'TOKEN_REFRESHED' && session) {
+              set({ session })
+            }
+          })
+        } catch (error) {
+          console.error('Auth initialization error:', error)
+          set({ isLoading: false })
+        }
+      },
+
+      // 비밀번호 재설정 이메일
+      resetPassword: async (email) => {
+        try {
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: `${window.location.origin}/auth/reset-password`,
+          })
+          if (error) throw error
+          return { error: null }
+        } catch (error) {
+          return { error }
+        }
+      },
+
+      // 비밀번호 업데이트
+      updatePassword: async (newPassword) => {
+        try {
+          const { error } = await supabase.auth.updateUser({
+            password: newPassword,
+          })
+          if (error) throw error
+          return { error: null }
+        } catch (error) {
+          return { error }
+        }
+      },
+    }),
+    {
+      name: 'cnec-auth',
+      partialize: (state) => ({
+        // persist할 필드만 선택
+      }),
+    }
+  )
+)
