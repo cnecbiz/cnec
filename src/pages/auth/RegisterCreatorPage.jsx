@@ -108,7 +108,7 @@ export function RegisterCreatorPage() {
     const finalData = { ...formData, ...data }
     setIsLoading(true)
 
-    const { error } = await signUp({
+    const { data: signUpData, error } = await signUp({
       email: finalData.email,
       password: finalData.password,
       userType: 'creator',
@@ -119,22 +119,43 @@ export function RegisterCreatorPage() {
         skin_type: finalData.skinType,
         skin_concerns: finalData.skinConcerns,
         categories: finalData.categories,
-        social_accounts: {
-          instagram: finalData.instagram,
-          tiktok: finalData.tiktok,
-          youtube: finalData.youtube,
-        },
+        instagram_handle: finalData.instagram,
+        tiktok_handle: finalData.tiktok,
+        youtube_handle: finalData.youtube,
       },
     })
 
     setIsLoading(false)
 
     if (error) {
-      toast.error(error.message || '회원가입에 실패했습니다.')
+      let errorMessage = '회원가입에 실패했습니다.'
+      if (error.message?.includes('already registered')) {
+        errorMessage = '이미 등록된 이메일입니다.'
+      } else if (error.message?.includes('User already registered')) {
+        errorMessage = '이미 등록된 이메일입니다.'
+      } else if (error.message?.includes('Password')) {
+        errorMessage = '비밀번호 형식이 올바르지 않습니다.'
+      } else if (error.message) {
+        errorMessage = error.message
+      }
+      toast.error(errorMessage)
       return
     }
 
-    toast.success('회원가입이 완료되었습니다. 이메일을 확인해 주세요.')
+    // 이미 등록된 이메일인 경우
+    if (signUpData?.user?.identities?.length === 0) {
+      toast.error('이미 등록된 이메일입니다.')
+      return
+    }
+
+    // 이메일 확인이 필요한 경우
+    if (signUpData?.user && !signUpData?.session) {
+      toast.success('가입 확인 이메일이 발송되었습니다. 이메일을 확인해 주세요.')
+      navigate('/auth/login')
+      return
+    }
+
+    toast.success('회원가입이 완료되었습니다!')
     navigate('/auth/login')
   }
 
