@@ -17,8 +17,9 @@ import { RegisterBrandPage } from '@/pages/auth/RegisterBrandPage'
 import { ForgotPasswordPage } from '@/pages/auth/ForgotPasswordPage'
 import { AuthCallbackPage } from '@/pages/auth/AuthCallbackPage'
 
-// Landing Page
+// Landing Pages
 import { LandingPage } from '@/pages/landing/LandingPage'
+import { CreatorLandingPage } from '@/pages/landing/CreatorLandingPage'
 
 // Admin Pages
 import { AdminDashboard } from '@/pages/admin/AdminDashboard'
@@ -121,8 +122,11 @@ function App() {
       <TooltipProvider>
         <Router>
           <Routes>
-            {/* Landing */}
+            {/* Landing - 광고주용 메인 페이지 */}
             <Route path="/" element={<LandingPage />} />
+
+            {/* Creator Landing - 크리에이터용 비공개 페이지 */}
+            <Route path="/join" element={<CreatorLandingPage />} />
 
             {/* Auth Routes */}
             <Route

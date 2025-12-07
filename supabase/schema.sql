@@ -545,3 +545,61 @@ $$ LANGUAGE plpgsql;
 CREATE TRIGGER update_applicant_count
   AFTER INSERT OR DELETE ON campaign_applications
   FOR EACH ROW EXECUTE FUNCTION update_campaign_applicant_count();
+
+-- ============================================================
+-- 11. 포트폴리오 테이블 (관리자가 등록하는 대표 영상)
+-- ============================================================
+
+CREATE TABLE portfolios (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title VARCHAR(255) NOT NULL,
+  description TEXT,
+  video_url TEXT NOT NULL,
+  thumbnail TEXT,
+  platform VARCHAR(50), -- tiktok, instagram, youtube
+  views INTEGER DEFAULT 0,
+  is_featured BOOLEAN DEFAULT FALSE, -- 메인 페이지에 노출 여부
+  sort_order INTEGER DEFAULT 0,
+  created_by UUID REFERENCES profiles(id),
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- 포트폴리오 RLS 정책
+ALTER TABLE portfolios ENABLE ROW LEVEL SECURITY;
+
+-- 누구나 조회 가능
+CREATE POLICY "Portfolios are viewable by everyone"
+  ON portfolios FOR SELECT
+  USING (true);
+
+-- 관리자만 생성/수정/삭제 가능
+CREATE POLICY "Only admins can insert portfolios"
+  ON portfolios FOR INSERT
+  WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.user_type = 'admin'
+    )
+  );
+
+CREATE POLICY "Only admins can update portfolios"
+  ON portfolios FOR UPDATE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.user_type = 'admin'
+    )
+  );
+
+CREATE POLICY "Only admins can delete portfolios"
+  ON portfolios FOR DELETE
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles
+      WHERE profiles.id = auth.uid()
+      AND profiles.user_type = 'admin'
+    )
+  );
