@@ -78,7 +78,7 @@ const campaigns = [
 
 export function LandingPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -195,7 +195,7 @@ export function LandingPage() {
             {campaigns.map((campaign) => (
               <Card
                 key={campaign.title}
-                className={`relative ${campaign.popular ? 'border-cnec-blue shadow-lg scale-105' : 'border-gray-200'}`}
+                className={`relative ${campaign.popular ? 'border-cnec-blue border-2 shadow-lg' : 'border-gray-200'}`}
               >
                 {campaign.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
