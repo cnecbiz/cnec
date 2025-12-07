@@ -16,6 +16,7 @@ import {
 import { Checkbox } from '@/components/ui/checkbox'
 import { toast } from '@/stores/uiStore'
 import { formatCurrency } from '@/lib/utils'
+import { generateCampaignPlan } from '@/lib/ai'
 import {
   ArrowLeft,
   ArrowRight,
@@ -25,6 +26,7 @@ import {
   Plus,
   X,
   Loader2,
+  RefreshCw,
 } from 'lucide-react'
 
 const steps = [
@@ -109,29 +111,21 @@ export function BrandCampaignNew() {
 
   const handleGenerateAI = async () => {
     setIsGeneratingAI(true)
-    // AI 기획안 생성 시뮬레이션
-    await new Promise((resolve) => setTimeout(resolve, 3000))
-    setAiPlan({
-      storyboard: [
-        { scene: 1, description: '후킹 - 피부 고민 언급', duration: '3초' },
-        { scene: 2, description: '제품 소개 - 언박싱', duration: '5초' },
-        { scene: 3, description: '사용 방법 시연', duration: '10초' },
-        { scene: 4, description: '비포/애프터 비교', duration: '7초' },
-        { scene: 5, description: '총평 및 추천', duration: '5초' },
-      ],
-      hookingMents: [
-        '"이 제품 덕분에 드디어 모공 고민 해결!"',
-        '"요즘 가장 많이 쓰는 스킨케어 공개"',
-        '"피부과 다녀온 것 같은 효과?!"',
-      ],
-      hashtags: ['#스킨케어추천', '#피부관리', '#뷰티리뷰', '#화장품추천'],
-      shootingTips: [
-        '자연광에서 촬영하면 피부톤이 더 자연스럽게 표현됩니다.',
-        '제품 텍스처를 클로즈업으로 촬영해 주세요.',
-        '비포/애프터는 동일한 조명에서 촬영해 주세요.',
-      ],
-    })
-    setIsGeneratingAI(false)
+    try {
+      const plan = await generateCampaignPlan(formData, { provider: 'mock' })
+      setAiPlan(plan)
+      toast.success('AI 기획안이 생성되었습니다.')
+    } catch (error) {
+      console.error('AI plan generation failed:', error)
+      toast.error('AI 기획안 생성에 실패했습니다. 다시 시도해 주세요.')
+    } finally {
+      setIsGeneratingAI(false)
+    }
+  }
+
+  const handleRegenerateAI = async () => {
+    setAiPlan(null)
+    await handleGenerateAI()
   }
 
   const handleNext = () => {
@@ -533,6 +527,13 @@ export function BrandCampaignNew() {
 
               {aiPlan && (
                 <div className="space-y-6 mt-6 p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <h3 className="font-semibold text-lg text-cnec-blue">생성된 기획안</h3>
+                    <Button variant="outline" size="sm" onClick={handleRegenerateAI} disabled={isGeneratingAI}>
+                      <RefreshCw className={`h-4 w-4 mr-1 ${isGeneratingAI ? 'animate-spin' : ''}`} />
+                      다시 생성
+                    </Button>
+                  </div>
                   <div>
                     <h3 className="font-semibold mb-3">스토리보드</h3>
                     <div className="space-y-2">
