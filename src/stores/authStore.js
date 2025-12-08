@@ -64,6 +64,47 @@ export const useAuthStore = create(
           })
           if (error) throw error
 
+          // 회원가입 성공 후 프로필 직접 생성
+          if (data.user) {
+            try {
+              await supabase.from('profiles').upsert({
+                id: data.user.id,
+                user_type: userType,
+                name: metadata?.name || metadata?.manager_name || '',
+                email: email,
+                status: 'pending',
+              }, { onConflict: 'id' })
+
+              // 광고주인 경우 brand_profiles도 생성
+              if (userType === 'brand') {
+                await supabase.from('brand_profiles').upsert({
+                  user_id: data.user.id,
+                  company_name: metadata?.company_name || '',
+                  ceo_name: metadata?.ceo_name || '',
+                  business_number: metadata?.business_number || '',
+                  manager_name: metadata?.manager_name || '',
+                  manager_phone: metadata?.manager_phone || '',
+                  brand_name: metadata?.brand_name || '',
+                  category: metadata?.category || '',
+                }, { onConflict: 'user_id' })
+              }
+
+              // 크리에이터인 경우 creator_profiles 생성
+              if (userType === 'creator') {
+                await supabase.from('creator_profiles').upsert({
+                  user_id: data.user.id,
+                  skin_type: metadata?.skin_type || '',
+                  instagram_handle: metadata?.instagram_handle || '',
+                  tiktok_handle: metadata?.tiktok_handle || '',
+                  youtube_handle: metadata?.youtube_handle || '',
+                }, { onConflict: 'user_id' })
+              }
+            } catch (profileError) {
+              console.error('Profile creation error:', profileError)
+              // 프로필 생성 실패해도 회원가입은 성공으로 처리
+            }
+          }
+
           set({ isLoading: false })
           return { data, error: null }
         } catch (error) {
