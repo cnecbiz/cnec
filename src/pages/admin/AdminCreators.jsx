@@ -444,19 +444,19 @@ export function AdminCreators() {
           </Card>
 
           <Card>
-            <CardContent className="p-0">
-              <Table>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table className="min-w-[900px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>크리에이터</TableHead>
-                    <TableHead>SNS</TableHead>
-                    <TableHead>등급</TableHead>
-                    <TableHead>캠페인</TableHead>
-                    <TableHead>포인트 잔액</TableHead>
-                    <TableHead>총 진행 금액</TableHead>
-                    <TableHead>평점</TableHead>
-                    <TableHead>가입일</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead className="min-w-[200px]">크리에이터</TableHead>
+                    <TableHead className="min-w-[80px]">SNS</TableHead>
+                    <TableHead className="min-w-[80px]">등급</TableHead>
+                    <TableHead className="min-w-[70px]">캠페인</TableHead>
+                    <TableHead className="min-w-[120px]">포인트 잔액</TableHead>
+                    <TableHead className="min-w-[120px]">총 진행 금액</TableHead>
+                    <TableHead className="min-w-[60px]">평점</TableHead>
+                    <TableHead className="min-w-[100px]">가입일</TableHead>
+                    <TableHead className="min-w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -521,18 +521,18 @@ export function AdminCreators() {
           </div>
 
           <Card>
-            <CardContent className="p-0">
-              <Table>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table className="min-w-[800px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>순위</TableHead>
-                    <TableHead>크리에이터</TableHead>
-                    <TableHead>SNS</TableHead>
-                    <TableHead>등급</TableHead>
-                    <TableHead>원고비</TableHead>
-                    <TableHead>캠페인</TableHead>
-                    <TableHead>평점</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead className="min-w-[60px]">순위</TableHead>
+                    <TableHead className="min-w-[200px]">크리에이터</TableHead>
+                    <TableHead className="min-w-[80px]">SNS</TableHead>
+                    <TableHead className="min-w-[80px]">등급</TableHead>
+                    <TableHead className="min-w-[100px]">원고비</TableHead>
+                    <TableHead className="min-w-[70px]">캠페인</TableHead>
+                    <TableHead className="min-w-[60px]">평점</TableHead>
+                    <TableHead className="min-w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -599,18 +599,18 @@ export function AdminCreators() {
           </div>
 
           <Card>
-            <CardContent className="p-0">
-              <Table>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table className="min-w-[900px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>크리에이터</TableHead>
-                    <TableHead>SNS</TableHead>
-                    <TableHead>등급</TableHead>
-                    <TableHead>원고비</TableHead>
-                    <TableHead>계약 시작</TableHead>
-                    <TableHead>계약 종료</TableHead>
-                    <TableHead>캠페인</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead className="min-w-[200px]">크리에이터</TableHead>
+                    <TableHead className="min-w-[80px]">SNS</TableHead>
+                    <TableHead className="min-w-[80px]">등급</TableHead>
+                    <TableHead className="min-w-[100px]">원고비</TableHead>
+                    <TableHead className="min-w-[100px]">계약 시작</TableHead>
+                    <TableHead className="min-w-[100px]">계약 종료</TableHead>
+                    <TableHead className="min-w-[70px]">캠페인</TableHead>
+                    <TableHead className="min-w-[80px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -670,19 +670,19 @@ export function AdminCreators() {
           </div>
 
           <Card>
-            <CardContent className="p-0">
-              <Table>
+            <CardContent className="p-0 overflow-x-auto">
+              <Table className="min-w-[1000px]">
                 <TableHeader>
                   <TableRow>
-                    <TableHead>크리에이터</TableHead>
-                    <TableHead>유튜브 채널</TableHead>
-                    <TableHead>원고비</TableHead>
-                    <TableHead>최근 업로드</TableHead>
-                    <TableHead>주간 업로드</TableHead>
-                    <TableHead>총 조회수</TableHead>
-                    <TableHead>총 영상</TableHead>
-                    <TableHead>경고</TableHead>
-                    <TableHead></TableHead>
+                    <TableHead className="min-w-[200px]">크리에이터</TableHead>
+                    <TableHead className="min-w-[140px]">유튜브 채널</TableHead>
+                    <TableHead className="min-w-[100px]">원고비</TableHead>
+                    <TableHead className="min-w-[100px]">최근 업로드</TableHead>
+                    <TableHead className="min-w-[100px]">주간 업로드</TableHead>
+                    <TableHead className="min-w-[100px]">총 조회수</TableHead>
+                    <TableHead className="min-w-[80px]">총 영상</TableHead>
+                    <TableHead className="min-w-[60px]">경고</TableHead>
+                    <TableHead className="min-w-[120px]"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
