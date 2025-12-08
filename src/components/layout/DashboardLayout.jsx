@@ -14,11 +14,11 @@ export function DashboardLayout({ portalType = 'admin' }) {
 
       <main
         className={cn(
-          'pt-16 transition-all duration-300',
-          sidebarCollapsed ? 'ml-16' : 'ml-72'
+          'min-h-screen pt-20 transition-all duration-300',
+          sidebarCollapsed ? 'ml-20' : 'ml-72'
         )}
       >
-        <div className="p-6">
+        <div className="mx-auto max-w-7xl px-6 py-6">
           <Outlet />
         </div>
       </main>
