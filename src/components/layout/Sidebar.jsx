@@ -30,6 +30,9 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  ExternalLink,
+  Store,
+  Video,
 } from 'lucide-react'
 
 // 어드민용 네비게이션
@@ -166,6 +169,68 @@ export function Sidebar({ portalType = 'admin' }) {
           ))}
         </nav>
       </ScrollArea>
+
+      {/* Portal Switch - Admin Only */}
+      {portalType === 'admin' && (
+        <div className="border-t border-gray-200 p-3">
+          {!sidebarCollapsed ? (
+            <div className="space-y-1">
+              <p className="px-2 text-xs font-medium text-gray-400 uppercase tracking-wider mb-2">
+                포털 바로가기
+              </p>
+              <NavLink
+                to="/brand"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-blue-50 hover:text-cnec-blue transition-colors"
+              >
+                <Store className="h-4 w-4" />
+                <span>광고주 포털</span>
+                <ExternalLink className="h-3 w-3 ml-auto" />
+              </NavLink>
+              <NavLink
+                to="/creator"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+              >
+                <Video className="h-4 w-4" />
+                <span>크리에이터 포털</span>
+                <ExternalLink className="h-3 w-3 ml-auto" />
+              </NavLink>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <NavLink
+                      to="/brand"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 hover:bg-blue-50 hover:text-cnec-blue transition-colors"
+                    >
+                      <Store className="h-5 w-5" />
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>광고주 포털</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip delayDuration={0}>
+                  <TooltipTrigger asChild>
+                    <NavLink
+                      to="/creator"
+                      className="flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 hover:bg-purple-50 hover:text-purple-600 transition-colors"
+                    >
+                      <Video className="h-5 w-5" />
+                    </NavLink>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">
+                    <p>크리에이터 포털</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer */}
       <div className="border-t border-gray-200 p-3">
