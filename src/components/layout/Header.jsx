@@ -31,8 +31,8 @@ export function Header({ portalType = 'admin' }) {
     <header
       className={cn(
         'fixed top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-4 transition-all duration-300',
-        sidebarCollapsed ? 'left-16' : 'left-64',
-        sidebarCollapsed ? 'w-[calc(100%-4rem)]' : 'w-[calc(100%-16rem)]'
+        sidebarCollapsed ? 'left-16' : 'left-72',
+        sidebarCollapsed ? 'w-[calc(100%-4rem)]' : 'w-[calc(100%-18rem)]'
       )}
     >
       <div className="flex items-center gap-4">

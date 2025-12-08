@@ -131,17 +131,17 @@ export function BrandDashboard() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${stat.color}`}>
-                  <stat.icon className="h-5 w-5" />
+          <Card key={stat.title} className="overflow-hidden">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-4">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${stat.color}`}>
+                  <stat.icon className="h-6 w-6" />
                 </div>
-                <div>
-                  <p className="text-sm text-gray-500">{stat.title}</p>
-                  <p className="text-xl font-bold text-gray-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm text-gray-500 truncate">{stat.title}</p>
+                  <p className="text-2xl font-bold text-gray-900 truncate">
                     {stat.title.includes('금액') || stat.title.includes('조회수')
                       ? stat.title.includes('금액')
                         ? formatCurrency(stat.value)

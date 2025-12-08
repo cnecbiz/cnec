@@ -15,7 +15,7 @@ export function DashboardLayout({ portalType = 'admin' }) {
       <main
         className={cn(
           'pt-16 transition-all duration-300',
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
+          sidebarCollapsed ? 'ml-16' : 'ml-72'
         )}
       >
         <div className="p-6">
