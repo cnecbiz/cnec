@@ -22,17 +22,39 @@ export function LandingPage() {
   useEffect(() => {
     // 포트폴리오 영상 로드 (관리자가 등록한 영상)
     async function loadPortfolios() {
-      const { data } = await supabase
-        .from('portfolios')
-        .select('*')
-        .eq('is_featured', true)
-        .order('created_at', { ascending: false })
-        .limit(6)
+      try {
+        const { data, error } = await supabase
+          .from('portfolios')
+          .select('*')
+          .eq('is_featured', true)
+          .order('created_at', { ascending: false })
+          .limit(6)
 
-      if (data && data.length > 0) {
-        setPortfolios(data)
-      } else {
-        // 기본 샘플 데이터
+        if (error) {
+          console.warn('포트폴리오 로드 실패:', error.message)
+          // 테이블이 없거나 에러 시 기본 데이터 사용
+          setPortfolios([
+            { id: 1, title: '뷰티 브랜드 A 캠페인', thumbnail: '/placeholder-1.jpg', video_url: '#' },
+            { id: 2, title: '스킨케어 런칭 캠페인', thumbnail: '/placeholder-2.jpg', video_url: '#' },
+            { id: 3, title: '메이크업 튜토리얼', thumbnail: '/placeholder-3.jpg', video_url: '#' },
+            { id: 4, title: '4주 챌린지 캠페인', thumbnail: '/placeholder-4.jpg', video_url: '#' },
+          ])
+          return
+        }
+
+        if (data && data.length > 0) {
+          setPortfolios(data)
+        } else {
+          // 기본 샘플 데이터
+          setPortfolios([
+            { id: 1, title: '뷰티 브랜드 A 캠페인', thumbnail: '/placeholder-1.jpg', video_url: '#' },
+            { id: 2, title: '스킨케어 런칭 캠페인', thumbnail: '/placeholder-2.jpg', video_url: '#' },
+            { id: 3, title: '메이크업 튜토리얼', thumbnail: '/placeholder-3.jpg', video_url: '#' },
+            { id: 4, title: '4주 챌린지 캠페인', thumbnail: '/placeholder-4.jpg', video_url: '#' },
+          ])
+        }
+      } catch (err) {
+        console.warn('포트폴리오 로드 에러:', err)
         setPortfolios([
           { id: 1, title: '뷰티 브랜드 A 캠페인', thumbnail: '/placeholder-1.jpg', video_url: '#' },
           { id: 2, title: '스킨케어 런칭 캠페인', thumbnail: '/placeholder-2.jpg', video_url: '#' },
@@ -97,7 +119,13 @@ export function LandingPage() {
                 <span style={{ fontSize: '14px', color: '#212121' }}>
                   {profile?.name || '사용자'}님
                 </span>
-                <Link to="/brand/dashboard" style={{
+                <Link to={
+                  profile?.user_type === 'admin'
+                    ? '/admin'
+                    : profile?.user_type === 'brand'
+                    ? '/brand'
+                    : '/creator'
+                } style={{
                   padding: '8px 16px',
                   fontSize: '14px',
                   color: '#0066FF',
