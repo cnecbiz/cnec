@@ -110,7 +110,7 @@ export const AdminSidebar = () => {
   };
 
   return (
-    <aside className="w-64 bg-gray-900 min-h-screen flex flex-col">
+    <aside className="w-64 flex-shrink-0 bg-gray-900 min-h-screen flex flex-col fixed left-0 top-0 z-40">
       {/* Logo */}
       <div className="px-6 py-4 border-b border-gray-800">
         <h1 className="text-xl font-bold text-white">CNEC Admin</h1>
