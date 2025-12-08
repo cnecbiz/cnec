@@ -28,6 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { formatFollowers } from '@/lib/utils'
+import { Label } from '@/components/ui/label'
 import {
   Search,
   Filter,
@@ -43,6 +44,11 @@ import {
   Eye,
   X,
   HeartOff,
+  Copy,
+  Check,
+  CheckCircle,
+  Truck,
+  Package,
 } from 'lucide-react'
 
 function TiktokIcon({ className }) {
@@ -73,6 +79,10 @@ const campaignCreators = [
     contentUrl: 'https://instagram.com/reel/abc123',
     fee: 400000,
     isFavorite: true,
+    partnershipCode: 'VITAMIN2024A',
+    trackingNumber: '1234567890123',
+    shippingStatus: 'delivered',
+    address: '서울시 강남구 테헤란로 123',
   },
   {
     id: '2',
@@ -92,6 +102,10 @@ const campaignCreators = [
     contentUrl: 'https://tiktok.com/@sua_beauty/video/123',
     fee: 500000,
     isFavorite: false,
+    partnershipCode: 'VITAMIN2024B',
+    trackingNumber: '9876543210987',
+    shippingStatus: 'delivered',
+    address: '서울시 서초구 서초대로 456',
   },
   {
     id: '3',
@@ -111,6 +125,10 @@ const campaignCreators = [
     contentUrl: null,
     fee: 800000,
     isFavorite: true,
+    partnershipCode: '',
+    trackingNumber: '5555666677778',
+    shippingStatus: 'shipped',
+    address: '부산시 해운대구 해운대로 789',
   },
   {
     id: '4',
@@ -130,6 +148,10 @@ const campaignCreators = [
     contentUrl: null,
     fee: 400000,
     isFavorite: false,
+    partnershipCode: 'VITAMIN2024D',
+    trackingNumber: '',
+    shippingStatus: 'pending',
+    address: '대구시 중구 중앙대로 321',
   },
 ]
 
@@ -193,6 +215,14 @@ export function BrandCreators() {
   // Preview dialog
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false)
   const [previewCreator, setPreviewCreator] = useState(null)
+
+  // Tracking dialog
+  const [trackingDialogOpen, setTrackingDialogOpen] = useState(false)
+  const [trackingCreator, setTrackingCreator] = useState(null)
+  const [trackingNumber, setTrackingNumber] = useState('')
+
+  // Copy state
+  const [copiedCode, setCopiedCode] = useState(null)
 
   // Filter creators
   const filteredCreators = creators.filter((c) => {
@@ -281,6 +311,48 @@ export function BrandCreators() {
     alert(`${fileName} 다운로드가 시작됩니다.`)
   }
 
+  // Copy partnership code
+  const copyPartnershipCode = (code, id) => {
+    navigator.clipboard.writeText(code)
+    setCopiedCode(id)
+    setTimeout(() => setCopiedCode(null), 2000)
+  }
+
+  // Approve review (검수 완료)
+  const approveReview = (creatorId) => {
+    setCreators(
+      creators.map((c) =>
+        c.id === creatorId ? { ...c, status: 'completed' } : c
+      )
+    )
+  }
+
+  // Open tracking dialog
+  const openTrackingDialog = (creator) => {
+    setTrackingCreator(creator)
+    setTrackingNumber(creator.trackingNumber || '')
+    setTrackingDialogOpen(true)
+  }
+
+  // Save tracking number
+  const saveTrackingNumber = () => {
+    if (trackingCreator) {
+      setCreators(
+        creators.map((c) =>
+          c.id === trackingCreator.id
+            ? { ...c, trackingNumber, shippingStatus: trackingNumber ? 'shipped' : 'pending' }
+            : c
+        )
+      )
+    }
+    setTrackingDialogOpen(false)
+  }
+
+  // Export to Excel
+  const exportToExcel = () => {
+    alert('엑셀 파일이 다운로드됩니다.')
+  }
+
   // Unique campaigns for filter
   const uniqueCampaigns = [
     ...new Map(creators.map((c) => [c.campaignId, { id: c.campaignId, name: c.campaignName }])).values(),
@@ -288,11 +360,17 @@ export function BrandCreators() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">크리에이터 현황</h1>
-        <p className="text-gray-500">
-          캠페인에 참여한 크리에이터를 확인하고 관리하세요.
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">크리에이터 현황</h1>
+          <p className="text-gray-500">
+            캠페인에 참여한 크리에이터를 확인하고 관리하세요.
+          </p>
+        </div>
+        <Button variant="outline" onClick={exportToExcel}>
+          <Download className="mr-2 h-4 w-4" />
+          엑셀 다운로드
+        </Button>
       </div>
 
       <Tabs defaultValue="campaign">
@@ -353,8 +431,8 @@ export function BrandCreators() {
                     <TableHead>크리에이터</TableHead>
                     <TableHead>캠페인</TableHead>
                     <TableHead>상태</TableHead>
-                    <TableHead>제출일</TableHead>
-                    <TableHead>금액</TableHead>
+                    <TableHead>배송</TableHead>
+                    <TableHead>파트너십코드</TableHead>
                     <TableHead>평점</TableHead>
                     <TableHead>파일</TableHead>
                     <TableHead className="text-right">관리</TableHead>
@@ -388,15 +466,77 @@ export function BrandCreators() {
                           {creator.campaignName}
                         </TableCell>
                         <TableCell>
-                          <Badge variant={statusLabels[creator.status]?.variant}>
-                            {statusLabels[creator.status]?.label}
-                          </Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={statusLabels[creator.status]?.variant}>
+                              {statusLabels[creator.status]?.label}
+                            </Badge>
+                            {creator.status === 'pending_review' && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 text-xs"
+                                onClick={() => approveReview(creator.id)}
+                              >
+                                <CheckCircle className="h-3 w-3 mr-1" />
+                                검수완료
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-500">
-                          {creator.submittedAt || '-'}
+                        <TableCell>
+                          <div className="flex items-center gap-1">
+                            {creator.trackingNumber ? (
+                              <>
+                                <Badge
+                                  variant={creator.shippingStatus === 'delivered' ? 'success' : 'warning'}
+                                  className="text-xs"
+                                >
+                                  {creator.shippingStatus === 'delivered' ? '배송완료' : '배송중'}
+                                </Badge>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-6 w-6"
+                                  onClick={() => openTrackingDialog(creator)}
+                                >
+                                  <Truck className="h-3 w-3" />
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="h-6 text-xs"
+                                onClick={() => openTrackingDialog(creator)}
+                              >
+                                <Package className="h-3 w-3 mr-1" />
+                                송장입력
+                              </Button>
+                            )}
+                          </div>
                         </TableCell>
-                        <TableCell className="font-medium">
-                          {creator.fee.toLocaleString()}원
+                        <TableCell>
+                          {creator.partnershipCode ? (
+                            <div className="flex items-center gap-1">
+                              <code className="text-xs bg-gray-100 px-1.5 py-0.5 rounded">
+                                {creator.partnershipCode}
+                              </code>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-6 w-6"
+                                onClick={() => copyPartnershipCode(creator.partnershipCode, creator.id)}
+                              >
+                                {copiedCode === creator.id ? (
+                                  <Check className="h-3 w-3 text-green-600" />
+                                ) : (
+                                  <Copy className="h-3 w-3" />
+                                )}
+                              </Button>
+                            </div>
+                          ) : (
+                            <span className="text-xs text-gray-400">-</span>
+                          )}
                         </TableCell>
                         <TableCell>
                           {creator.status === 'completed' ? (
@@ -740,6 +880,62 @@ export function BrandCreators() {
           )}
           <DialogFooter>
             <Button onClick={() => setPreviewDialogOpen(false)}>닫기</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tracking Number Dialog */}
+      <Dialog open={trackingDialogOpen} onOpenChange={setTrackingDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>송장 번호 입력</DialogTitle>
+          </DialogHeader>
+          {trackingCreator && (
+            <div className="space-y-4">
+              <div className="p-3 bg-gray-50 rounded-lg">
+                <p className="font-medium">{trackingCreator.name}</p>
+                <p className="text-sm text-gray-500">{trackingCreator.address}</p>
+              </div>
+              <div className="space-y-2">
+                <Label>송장 번호</Label>
+                <Input
+                  placeholder="송장 번호를 입력하세요"
+                  value={trackingNumber}
+                  onChange={(e) => setTrackingNumber(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>배송 상태</Label>
+                <Select
+                  value={trackingCreator.shippingStatus}
+                  onValueChange={(value) => {
+                    setCreators(
+                      creators.map((c) =>
+                        c.id === trackingCreator.id
+                          ? { ...c, shippingStatus: value }
+                          : c
+                      )
+                    )
+                    setTrackingCreator({ ...trackingCreator, shippingStatus: value })
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="pending">배송 준비중</SelectItem>
+                    <SelectItem value="shipped">배송중</SelectItem>
+                    <SelectItem value="delivered">배송 완료</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setTrackingDialogOpen(false)}>
+              취소
+            </Button>
+            <Button onClick={saveTrackingNumber}>저장</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
