@@ -46,6 +46,7 @@ export function LoginPage() {
     }
 
     toast.success('로그인되었습니다.')
+    navigate('/')
   }
 
   const handleSocialLogin = async (provider) => {

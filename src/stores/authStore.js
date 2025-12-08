@@ -159,7 +159,7 @@ export const useAuthStore = create(
         }
       },
 
-      // 프로필 가져오기
+      // 프로필 가져오기 (없으면 생성)
       fetchProfile: async () => {
         const { user } = get()
         if (!user) return
@@ -171,11 +171,41 @@ export const useAuthStore = create(
             .eq('id', user.id)
             .single()
 
-          if (error && error.code !== 'PGRST116') throw error
+          // 프로필이 없으면 생성
+          if (error && (error.code === 'PGRST116' || error.message?.includes('406'))) {
+            console.log('Profile not found, creating one...')
+            const userMeta = user.user_metadata || {}
+            const newProfile = {
+              id: user.id,
+              user_type: userMeta.user_type || 'brand',
+              name: userMeta.name || userMeta.manager_name || user.email?.split('@')[0] || '',
+              email: user.email,
+              status: 'pending',
+            }
+
+            const { data: createdProfile, error: createError } = await supabase
+              .from('profiles')
+              .insert(newProfile)
+              .select()
+              .single()
+
+            if (createError) {
+              console.error('Failed to create profile:', createError)
+              // 프로필 생성 실패해도 기본 프로필 설정
+              set({ profile: newProfile })
+              return { data: newProfile, error: null }
+            }
+
+            set({ profile: createdProfile })
+            return { data: createdProfile, error: null }
+          }
+
+          if (error) throw error
 
           set({ profile: data })
           return { data, error: null }
         } catch (error) {
+          console.error('fetchProfile error:', error)
           return { data: null, error }
         }
       },

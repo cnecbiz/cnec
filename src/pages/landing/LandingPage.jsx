@@ -1,10 +1,23 @@
 import { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { supabase } from '@/lib/supabase'
+import { useAuthStore } from '@/stores/authStore'
 
 export function LandingPage() {
+  const navigate = useNavigate()
+  const { isAuthenticated, profile, signOut, initializeAuth } = useAuthStore()
   const [portfolios, setPortfolios] = useState([])
   const [activeVideo, setActiveVideo] = useState(0)
+
+  // 인증 상태 초기화
+  useEffect(() => {
+    initializeAuth()
+  }, [])
+
+  const handleLogout = async () => {
+    await signOut()
+    navigate('/')
+  }
 
   useEffect(() => {
     // 포트폴리오 영상 로드 (관리자가 등록한 영상)
@@ -79,25 +92,59 @@ export function LandingPage() {
           </nav>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <Link to="/auth/login" style={{
-              padding: '8px 16px',
-              fontSize: '14px',
-              color: '#212121',
-              textDecoration: 'none',
-            }}>
-              로그인
-            </Link>
-            <Link to="/auth/register/brand" style={{
-              padding: '10px 24px',
-              fontSize: '14px',
-              color: '#fff',
-              backgroundColor: '#0066FF',
-              borderRadius: '8px',
-              textDecoration: 'none',
-              fontWeight: '500',
-            }}>
-              캠페인 신청하기
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <span style={{ fontSize: '14px', color: '#212121' }}>
+                  {profile?.name || '사용자'}님
+                </span>
+                <Link to="/brand/dashboard" style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  color: '#0066FF',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                }}>
+                  마이페이지
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  style={{
+                    padding: '10px 24px',
+                    fontSize: '14px',
+                    color: '#fff',
+                    backgroundColor: '#FF4444',
+                    borderRadius: '8px',
+                    border: 'none',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                  }}
+                >
+                  로그아웃
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth/login" style={{
+                  padding: '8px 16px',
+                  fontSize: '14px',
+                  color: '#212121',
+                  textDecoration: 'none',
+                }}>
+                  로그인
+                </Link>
+                <Link to="/auth/register/brand" style={{
+                  padding: '10px 24px',
+                  fontSize: '14px',
+                  color: '#fff',
+                  backgroundColor: '#0066FF',
+                  borderRadius: '8px',
+                  textDecoration: 'none',
+                  fontWeight: '500',
+                }}>
+                  캠페인 신청하기
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </header>
