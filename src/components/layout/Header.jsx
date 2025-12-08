@@ -124,17 +124,28 @@ export function Header({ portalType = 'admin' }) {
             <DropdownMenuLabel>내 계정</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link to={`/${portalType}/profile`} className="flex items-center">
+              <Link
+                to={
+                  portalType === 'creator'
+                    ? '/creator/profile'
+                    : portalType === 'brand'
+                    ? '/brand/settings'
+                    : '/admin/site'
+                }
+                className="flex items-center"
+              >
                 <User className="mr-2 h-4 w-4" />
-                프로필
+                {portalType === 'creator' ? '프로필' : '계정 설정'}
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to={`/${portalType}/settings`} className="flex items-center">
-                <Settings className="mr-2 h-4 w-4" />
-                설정
-              </Link>
-            </DropdownMenuItem>
+            {portalType !== 'admin' && (
+              <DropdownMenuItem asChild>
+                <Link to={`/${portalType}/settings`} className="flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  설정
+                </Link>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={signOut} className="text-error">
               <LogOut className="mr-2 h-4 w-4" />
