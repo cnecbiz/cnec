@@ -77,7 +77,9 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to="/auth/login" replace />
   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(profile?.user_type)) {
+  // 관리자는 모든 페이지 접근 가능
+  const isAdmin = profile?.user_type === 'admin'
+  if (allowedRoles.length > 0 && !isAdmin && !allowedRoles.includes(profile?.user_type)) {
     return <Navigate to="/" replace />
   }
 
