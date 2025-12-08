@@ -86,7 +86,7 @@ function AdminSite() {
       </aside>
 
       {/* Main Content */}
-      <main className="main-content">
+      <main className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         {/* Header */}
         <header className="header">
           <div className="header-left">

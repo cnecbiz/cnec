@@ -220,7 +220,7 @@
   min-height: 100vh;
 }
 
-.sidebar.collapsed ~ .main-content {
+.main-content.sidebar-collapsed {
   margin-left: var(--sidebar-collapsed);
 }
 
